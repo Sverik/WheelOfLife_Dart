@@ -77,7 +77,7 @@ void update(double time) {
 
 	ticking = false;
 
-	new Future.delayed(const Duration(milliseconds: 40), () {
+	new Future.delayed(const Duration(milliseconds: 20), () {
 		requestTick();
 	});
 }

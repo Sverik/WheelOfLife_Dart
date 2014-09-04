@@ -2,7 +2,7 @@ library state;
 
 class State {
 	/** Camera angle */
-	double c_a = 280.0;
+	double c_a = 20.0;
 	/** Camera radius, this radius is at vieport bottom */
 	double c_r = 60.0;
 

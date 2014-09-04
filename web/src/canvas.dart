@@ -47,9 +47,9 @@ class Canvas {
 
 		paintBackground(g);
 
-		return;
-
 		paintWorld(g);
+
+		return;
 
 		paintBloke(g);
 
@@ -66,7 +66,7 @@ class Canvas {
 		double angle = worldToScreenAngle(0.0);
 		for (Color c in backgrounds) {
 			g.beginPath();
-			PointM p = polarToScreen(angle + 90.0, r, null);
+			PointM p = polarToScreen(angle - 90.0, r, null);
 			g.moveTo(p.x, p.y);
 			log("move:x=${p.x.truncate()},y=${p.y.truncate()}");
 			g.lineTo(cx, cy);
@@ -74,7 +74,7 @@ class Canvas {
 			polarToScreen(angle, r, p);
 			g.lineTo(p.x, p.y);
 			log("line:x=${p.x.truncate()},y=${p.y.truncate()}");
-			g.arc(cx, cy, r, angle * math.PI / 180.0, (angle + 0.1) * math.PI / 180.0 + math.PI / 2, false);
+			g.arc(cx, cy, r, angle * math.PI / 180.0, (angle - 0.1) * math.PI / 180.0 - math.PI / 2, true);
 			log("arc:x=${cx.truncate()},y=${cy.truncate()}");
 			g.fillStyle = c.rgb;
 //			g.strokeStyle = c.rgb;
@@ -83,7 +83,8 @@ class Canvas {
 
 //			Arc2D.double arc = new Arc2D.double(ox, oy, (r * 2), (r * 2), angle, 90.1f, Arc2D.PIE);
 //			g.fill(arc);
-			angle += 90.0;
+			angle -= 90.0;
+//			break;
 
 		}
 	}
@@ -93,35 +94,39 @@ class Canvas {
 	}
 
 	void paintWorld(CanvasRenderingContext2D g) {
+		g.strokeStyle = "#000";
 		for (Line line in world.getLines()) {
-			g.setColor(Color.BLACK);
 
 			paintLineWithArc(g, line);
 
-//			g.setColor(Color.RED);
-//			Point2D.double cs = polarToScreen(line.a0, line.r0);
-//			g.fillOval((int)(cs.x - 3), (int)(cs.y - 3), 6, 6);
 		}
 	}
 
 	void paintLineWithArc(CanvasRenderingContext2D g, Line line) {
-		double thickness = Math.abs(line.r1 - line.r0);
-		g.setStroke(new BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+		g.beginPath();
+
+		double thickness = (line.r1 - line.r0).abs();
+		g.lineWidth = thickness;
+//		g.setStroke(new BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
 		double r = (line.r0 + line.r1) / 2;
 
 		double ox = -(r - w_2);
+		double cx = ox + r;
 		double oy = -(r + state.c_r - height);
+		double cy = oy + r;
 
 		double arc = line.a1 - line.a0;
 		if (arc < 0) {
 			arc += 360;
 		}
 
-		double startAngle = worldToScreenAngle(line.a0);
+		double startAngle_r = worldToScreenAngle(line.a0) * math.PI / 180.0;
+		double endAngle_r = worldToScreenAngle(line.a1) * math.PI / 180.0;
 
-		Arc2D.double af = new Arc2D.double(ox, oy, (r * 2), (r * 2), startAngle, arc, Arc2D.OPEN);
-		g.draw(af);
+		g.arc(cx, cy, r, startAngle_r, endAngle_r, true);
+		g.stroke();
+//		Arc2D.double af = new Arc2D.double(ox, oy, (r * 2), (r * 2), startAngle, arc, Arc2D.OPEN);
 
 	}
 
@@ -174,7 +179,7 @@ class Canvas {
 	}
 
 	double worldToScreenAngle(double worldAngle) {
-		return worldAngle - state.c_a - 90;
+		return - worldAngle + state.c_a + 90;
 	}
 
 }
