@@ -15,10 +15,11 @@ class Canvas {
 	static final List<Color> backgrounds = [new Color(211, 248, 255), new Color(168, 255, 125), new Color(234, 217, 87), new Color(203, 100, 99)];
 
 	static final blokeColors = {
-		Season.WINTER : new Color(35, 95, 217),
-		Season.SPRING : new Color(85, 162, 58),
-		Season.SUMMER : new Color(129, 142, 79),
-		Season.AUTUMN : new Color(131, 49, 36)};
+		Season.WINTER: new Color(35, 95, 217),
+		Season.SPRING: new Color(85, 162, 58),
+		Season.SUMMER: new Color(129, 142, 79),
+		Season.AUTUMN: new Color(131, 49, 36)
+	};
 
 	final State state;
 	final World world;
@@ -35,8 +36,7 @@ class Canvas {
 
 	Canvas(State state, World world)
 			: state = state,
-			  world = world {
-	}
+			  world = world;
 
 	void repaint(CanvasElement canvasElement, double delta) {
 		this.delta = delta;
@@ -61,7 +61,7 @@ class Canvas {
 	}
 
 	void paintBackground(CanvasRenderingContext2D g) {
-		g.setFillColorRgb(0, 0, 192);
+		g.setFillColorRgb(192, 192, 192);
 		g.fillRect(0, 0, width, height);
 
 		const double r = 1500.0;
@@ -72,15 +72,11 @@ class Canvas {
 			g.beginPath();
 			PointM p = polarToScreen(angle + 90.0, r, null);
 			g.moveTo(p.x, p.y);
-			log("move:x=${p.x.truncate()},y=${p.y.truncate()}");
 			g.lineTo(cx, cy);
-			log("line:x=${cx.truncate()},y=${cy.truncate()}");
 			polarToScreen(angle, r, p);
 			g.lineTo(p.x, p.y);
-			log("line:x=${p.x.truncate()},y=${p.y.truncate()}");
 			double screenAngle_r = worldToScreenAngle(angle) * math.PI / 180.0;
 			g.arc(cx, cy, r, screenAngle_r, screenAngle_r - math.PI / 2, true);
-			log("arc:x=${cx.truncate()},y=${cy.truncate()},s=${angle}");
 			g.fillStyle = c.rgb;
 //			g.strokeStyle = c.rgb;
 //			g.stroke();
@@ -88,10 +84,6 @@ class Canvas {
 
 			angle += 90.0;
 		}
-	}
-
-	void log(String text) {
-		querySelector("#sample_text_id").text += "\n" + text;
 	}
 
 	void paintWorld(CanvasRenderingContext2D g) {
@@ -135,7 +127,7 @@ class Canvas {
 
 		g.beginPath();
 		g.arc(s.x, s.y, 5, 0, math.PI * 2);
-		g.fillStyle = blokeColors[state.season];
+		g.fillStyle = blokeColors[state.season].rgb;
 		g.fill();
 	}
 
@@ -180,7 +172,7 @@ class Canvas {
 	}
 
 	double worldToScreenAngle(double worldAngle) {
-		return - worldAngle + state.c_a + 90;
+		return -worldAngle + state.c_a + 90;
 	}
 
 }

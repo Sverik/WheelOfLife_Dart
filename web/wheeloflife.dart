@@ -5,6 +5,9 @@ import 'dart:async';
 import 'src/state.dart';
 import 'src/world.dart';
 import 'src/canvas.dart';
+import 'src/logic.dart';
+import 'src/keyboard.dart';
+import 'src/input_state.dart';
 
 const String ORANGE = "orange";
 const int SEED_RADIUS = 25;
@@ -29,24 +32,13 @@ double avg = 0.0;
 final State state = new State();
 final World world = new World();
 final Canvas canvas = new Canvas(state, world);
+final InputState inputState = new InputState();
+final Logic logic = new Logic(state, inputState, world);
 
 void main() {
-	querySelector("#sample_text_id")
-			..text = "Click me!"
-			..onClick.listen(reverseText);
-
 	world.load();
 
-	requestTick();
-}
-
-void reverseText(MouseEvent event) {
-	var text = querySelector("#sample_text_id").text;
-	var buffer = new StringBuffer();
-	for (int i = text.length - 1; i >= 0; i--) {
-		buffer.write(text[i]);
-	}
-	querySelector("#sample_text_id").text = buffer.toString();
+	new KeyboardListener(inputState);
 
 	requestTick();
 }
@@ -68,9 +60,8 @@ void update(double time) {
 		min = math.min(min, diff);
 		max = math.max(max, diff);
 		avg = (avg * count + diff) / ++count;
-		querySelector("#sample_text_id").text = min.truncate().toString() + " ms ... " + max.truncate().toString() + " ms, " + avg.truncate().toString() + " ms, time=" + time.truncate().toString() + ", c_a=" + state.c_a.truncate().toString();
 
-		logic(diff);
+		logic.step(diff);
 
   	draw(diff);
 	}
@@ -82,23 +73,8 @@ void update(double time) {
 	});
 }
 
-void logic(double delta) {
-//	state.c_a += delta / 50;
-	state.c_a = state.c_a % 360.0;
-}
-
 void draw(double delta) {
-//	var random = new math.Random();
-//	random.nextInt(300)
 	canvas.repaint(canvasElement, delta);
-
-//	context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-	context..beginPath()
-				 ..lineWidth = 20
-				 ..strokeStyle = ORANGE
-				 ..arc(100, 120, SEED_RADIUS, 0, state.p_a / 180.0 * math.PI, false)
-				 ..stroke();
 
 	ticking = false;
 }
