@@ -11,7 +11,7 @@ class World {
 		return lines;
 	}
 
-	void load() {
+	void load(Function callback) {
 	  var semicolon = ';'.codeUnitAt(0);
     var result = [];
 
@@ -23,6 +23,8 @@ class World {
       for (Match m in matches) {
       	parseParameters(m.group(1));
       }
+
+      callback();
     });
 	}
 

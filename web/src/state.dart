@@ -7,7 +7,7 @@ class State {
 	double c_r = 1400.0;
 
 	double p_a = 107.0;
-	double p_r = 155.0;
+	double p_r = 238.0;
 
 	/** Character's radial velocity */
 	double p_rv = 0.0;

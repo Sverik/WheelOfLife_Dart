@@ -36,11 +36,12 @@ final InputState inputState = new InputState();
 final Logic logic = new Logic(state, inputState, world);
 
 void main() {
-	world.load();
-
 	new KeyboardListener(inputState);
 
-	requestTick();
+	world.load((){
+		requestTick();
+	});
+
 }
 
 void requestTick() {
