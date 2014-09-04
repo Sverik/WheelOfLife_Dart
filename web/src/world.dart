@@ -21,7 +21,6 @@ class World {
       RegExp exp = new RegExp(r"L\(([^)]+)\)");
       Iterable<Match> matches = exp.allMatches(clean);
       for (Match m in matches) {
-      	print("[" + m.group(1) + "]");
       	parseParameters(m.group(1));
       }
     });

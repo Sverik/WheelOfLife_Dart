@@ -83,9 +83,7 @@ void update(double time) {
 }
 
 void logic(double delta) {
-	state.p_a += delta / 2;
-	state.p_a = state.p_a % 360.0;
-	state.c_a += delta / 50;
+//	state.c_a += delta / 50;
 	state.c_a = state.c_a % 360.0;
 }
 

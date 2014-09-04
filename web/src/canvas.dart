@@ -14,7 +14,11 @@ class Canvas {
 
 	static final List<Color> backgrounds = [new Color(211, 248, 255), new Color(168, 255, 125), new Color(234, 217, 87), new Color(203, 100, 99)];
 
-	static final List<Color> blokeColors = [new Color(35, 95, 217), new Color(85, 162, 58), new Color(129, 142, 79), new Color(131, 49, 36)];
+	static final blokeColors = {
+		Season.WINTER : new Color(35, 95, 217),
+		Season.SPRING : new Color(85, 162, 58),
+		Season.SUMMER : new Color(129, 142, 79),
+		Season.AUTUMN : new Color(131, 49, 36)};
 
 	final State state;
 	final World world;
@@ -49,9 +53,9 @@ class Canvas {
 
 		paintWorld(g);
 
-		return;
-
 		paintBloke(g);
+
+		return;
 
 		paintOverlay(g);
 	}
@@ -63,10 +67,10 @@ class Canvas {
 		const double r = 1500.0;
 		double cx = w_2;
 		double cy = -state.c_r + height;
-		double angle = worldToScreenAngle(0.0);
+		double angle = 0.0;
 		for (Color c in backgrounds) {
 			g.beginPath();
-			PointM p = polarToScreen(angle - 90.0, r, null);
+			PointM p = polarToScreen(angle + 90.0, r, null);
 			g.moveTo(p.x, p.y);
 			log("move:x=${p.x.truncate()},y=${p.y.truncate()}");
 			g.lineTo(cx, cy);
@@ -74,18 +78,15 @@ class Canvas {
 			polarToScreen(angle, r, p);
 			g.lineTo(p.x, p.y);
 			log("line:x=${p.x.truncate()},y=${p.y.truncate()}");
-			g.arc(cx, cy, r, angle * math.PI / 180.0, (angle - 0.1) * math.PI / 180.0 - math.PI / 2, true);
-			log("arc:x=${cx.truncate()},y=${cy.truncate()}");
+			double screenAngle_r = worldToScreenAngle(angle) * math.PI / 180.0;
+			g.arc(cx, cy, r, screenAngle_r, screenAngle_r - math.PI / 2, true);
+			log("arc:x=${cx.truncate()},y=${cy.truncate()},s=${angle}");
 			g.fillStyle = c.rgb;
 //			g.strokeStyle = c.rgb;
 //			g.stroke();
 			g.fill();
 
-//			Arc2D.double arc = new Arc2D.double(ox, oy, (r * 2), (r * 2), angle, 90.1f, Arc2D.PIE);
-//			g.fill(arc);
-			angle -= 90.0;
-//			break;
-
+			angle += 90.0;
 		}
 	}
 
@@ -107,7 +108,6 @@ class Canvas {
 
 		double thickness = (line.r1 - line.r0).abs();
 		g.lineWidth = thickness;
-//		g.setStroke(new BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
 		double r = (line.r0 + line.r1) / 2;
 
@@ -126,16 +126,17 @@ class Canvas {
 
 		g.arc(cx, cy, r, startAngle_r, endAngle_r, true);
 		g.stroke();
-//		Arc2D.double af = new Arc2D.double(ox, oy, (r * 2), (r * 2), startAngle, arc, Arc2D.OPEN);
 
 	}
 
 	void paintBloke(CanvasRenderingContext2D g) {
 
-		Point2D.double s = polarToScreen(state.p_a, state.p_r - 3);
+		PointM s = polarToScreen(state.p_a, state.p_r);
 
-		g.setColor(blokeColors[state.season.ordinal()]);
-		g.fillOval((int)(s.x - 5), (int)(s.y - 5), 10, 10);
+		g.beginPath();
+		g.arc(s.x, s.y, 5, 0, math.PI * 2);
+		g.fillStyle = blokeColors[state.season];
+		g.fill();
 	}
 
 	void paintOverlay(CanvasRenderingContext2D g) {
@@ -165,12 +166,12 @@ class Canvas {
 		return out;
 	}
 
-	PointM polarToScreen(double a, double r, PointM out) {
+	PointM polarToScreen(double a, double r, [PointM out = null]) {
 		if (out == null) {
 			out = new PointM(0.0, 0.0);
 		}
 
-		polarToCart(a, r, out);
+		polarToCart(worldToScreenAngle(a), r, out);
 
 		out.x += w_2;
 		out.y += height - state.c_r;
